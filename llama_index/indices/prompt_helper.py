@@ -149,13 +149,12 @@ class PromptHelper:
         if chunk_size == 0:
             raise ValueError("Got 0 as available chunk size.")
         chunk_overlap = int(self.chunk_overlap_ratio * chunk_size)
-        text_splitter = TokenTextSplitter(
+        return TokenTextSplitter(
             separator=self._separator,
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
             tokenizer=self._tokenizer,
         )
-        return text_splitter
 
     def truncate(
         self, prompt: Prompt, text_chunks: Sequence[str], padding: int = DEFAULT_PADDING

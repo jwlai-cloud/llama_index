@@ -87,9 +87,9 @@ def test_redis_docstore_deserialization(
     from llama_index.storage.index_store import RedisIndexStore
 
     ds = RedisDocumentStore.from_host_and_port(
-        "127.0.0.1", int(6379), namespace="data4"
+        "127.0.0.1", 6379, namespace="data4"
     )
-    idxs = RedisIndexStore.from_host_and_port("127.0.0.1", int(6379), namespace="data4")
+    idxs = RedisIndexStore.from_host_and_port("127.0.0.1", 6379, namespace="data4")
 
     storage_context = StorageContext.from_defaults(docstore=ds, index_store=idxs)
 

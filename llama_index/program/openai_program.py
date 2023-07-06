@@ -105,5 +105,4 @@ class OpenAIPydanticProgram(BaseLLMFunctionProgram[OpenAI]):
             arguments_str = function_call["arguments"]
             print(f"Function call: {name} with args: {arguments_str}")
 
-        output = self.output_cls.parse_raw(function_call["arguments"])
-        return output
+        return self.output_cls.parse_raw(function_call["arguments"])

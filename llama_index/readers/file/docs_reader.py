@@ -39,7 +39,7 @@ class PDFReader(BaseReader):
 
                 metadata = {"page_label": page_label, "file_name": file.name}
                 if extra_info is not None:
-                    metadata.update(extra_info)
+                    metadata |= extra_info
 
                 docs.append(Document(text=page_text, metadata=metadata))
             return docs
@@ -63,6 +63,6 @@ class DocxReader(BaseReader):
         text = docx2txt.process(file)
         metadata = {"file_name": file.name}
         if extra_info is not None:
-            metadata.update(extra_info)
+            metadata |= extra_info
 
         return [Document(text=text, metadata=metadata or {})]

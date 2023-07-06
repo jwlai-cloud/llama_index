@@ -99,7 +99,7 @@ class BaseSynthesizer(ABC):
                 source_nodes=source_nodes,
                 metadata=response_metadata,
             )
-        elif response_str is None or isinstance(response_str, Generator):
+        elif isinstance(response_str, Generator):
             return StreamingResponse(
                 response_str,
                 source_nodes=source_nodes,

@@ -64,18 +64,9 @@ GPT3_MODELS = {
     "davinci": 2049,
 }
 
-ALL_AVAILABLE_MODELS = {
-    **GPT4_MODELS,
-    **TURBO_MODELS,
-    **GPT3_5_MODELS,
-    **GPT3_MODELS,
-}
+ALL_AVAILABLE_MODELS = GPT4_MODELS | TURBO_MODELS | GPT3_5_MODELS | GPT3_MODELS
 
-CHAT_MODELS = {
-    **GPT4_MODELS,
-    **TURBO_MODELS,
-    **AZURE_TURBO_MODELS,
-}
+CHAT_MODELS = GPT4_MODELS | TURBO_MODELS | AZURE_TURBO_MODELS
 
 
 DISCONTINUED_MODELS = {
@@ -181,10 +172,7 @@ def is_chat_model(model: str) -> bool:
 
 
 def get_completion_endpoint(is_chat_model: bool) -> CompletionClientType:
-    if is_chat_model:
-        return openai.ChatCompletion
-    else:
-        return openai.Completion
+    return openai.ChatCompletion if is_chat_model else openai.Completion
 
 
 def to_openai_message_dict(message: ChatMessage) -> dict:
@@ -197,7 +185,7 @@ def to_openai_message_dict(message: ChatMessage) -> dict:
     # NOTE: openai messages have additional arguments:
     # - function messages have `name`
     # - assistant messages have optional `function_call`
-    message_dict.update(message.additional_kwargs)
+    message_dict |= message.additional_kwargs
 
     return message_dict
 

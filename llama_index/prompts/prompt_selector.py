@@ -16,10 +16,10 @@ class PromptSelector(BaseModel):
         if llm is None:
             return self.default_prompt
 
-        for condition, prompt in self.conditionals:
-            if condition(llm):
-                return prompt
-        return self.default_prompt
+        return next(
+            (prompt for condition, prompt in self.conditionals if condition(llm)),
+            self.default_prompt,
+        )
 
 
 def is_chat_model(llm: LLM) -> bool:

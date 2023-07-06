@@ -16,9 +16,7 @@ def get_empty_prompt_txt(prompt: Prompt) -> str:
         for v in prompt.get_langchain_prompt().input_variables
         if v not in prompt.partial_dict
     }
-    # TODO: change later from llm=None
-    empty_prompt_txt = prompt.format(llm=None, **fmt_dict)
-    return empty_prompt_txt
+    return prompt.format(llm=None, **fmt_dict)
 
 
 def get_biggest_prompt(prompts: List[Prompt]) -> Prompt:
@@ -31,5 +29,4 @@ def get_biggest_prompt(prompts: List[Prompt]) -> Prompt:
     """
     empty_prompt_txts = [get_empty_prompt_txt(prompt) for prompt in prompts]
     empty_prompt_txt_lens = [len(txt) for txt in empty_prompt_txts]
-    biggest_prompt = prompts[empty_prompt_txt_lens.index(max(empty_prompt_txt_lens))]
-    return biggest_prompt
+    return prompts[empty_prompt_txt_lens.index(max(empty_prompt_txt_lens))]

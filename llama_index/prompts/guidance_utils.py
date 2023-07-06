@@ -32,8 +32,7 @@ def convert_to_handlebars(text: str) -> str:
 
     # Replace the temporary placeholder with single braces
     text = text.replace(var_left, "{")
-    text = text.replace(var_right, "}")
-    return text
+    return text.replace(var_right, "}")
 
 
 def wrap_json_markdown(text: str) -> str:
@@ -65,7 +64,6 @@ def json_schema_to_guidance_output_template(
         blob/main/notebooks/applications/jsonformer.ipynb
     Modified to support nested pydantic models.
     """
-    out = ""
     if "type" not in schema and "$ref" in schema:
         if root is None:
             raise ValueError("Must specify root schema for nested object")
@@ -77,6 +75,7 @@ def json_schema_to_guidance_output_template(
         )
 
     if schema["type"] == "object":
+        out = ""
         out += "  " * indent + "{\n"
         for k, v in schema["properties"].items():
             out += (
@@ -143,7 +142,7 @@ def parse_pydantic_from_guidance_program(
     """
     try:
         output = program.text.split("```json")[-1]
-        output = "```json" + output
+        output = f"```json{output}"
         if verbose:
             print("Raw output:")
             print(output)

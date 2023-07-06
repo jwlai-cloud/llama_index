@@ -61,11 +61,7 @@ class VellumPredictor(BaseLLMPredictor):
             ],
         )
 
-        completion_text = self._process_generate_response(
-            result, compiled_prompt, event_id
-        )
-
-        return completion_text
+        return self._process_generate_response(result, compiled_prompt, event_id)
 
     def stream(self, prompt: Prompt, **prompt_args: Any) -> TokenGen:
         """Stream the answer to a query."""
@@ -132,11 +128,7 @@ class VellumPredictor(BaseLLMPredictor):
             ],
         )
 
-        completion_text = self._process_generate_response(
-            result, compiled_prompt, event_id
-        )
-
-        return completion_text
+        return self._process_generate_response(result, compiled_prompt, event_id)
 
     async def astream(self, prompt: Prompt, **prompt_args: Any) -> TokenAsyncGen:
         async def gen() -> TokenAsyncGen:

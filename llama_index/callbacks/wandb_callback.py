@@ -217,8 +217,7 @@ class WandbCallbackHandler(BaseCallbackHandler):
     def log_trace_tree(self) -> None:
         """Log the trace tree to wandb."""
         try:
-            root_span = self._build_trace_tree()
-            if root_span:
+            if root_span := self._build_trace_tree():
                 root_trace = self._trace_tree.WBTraceTree(root_span)
                 if self._wandb.run:
                     self._wandb.run.log({"trace": root_trace})
@@ -399,13 +398,9 @@ class WandbCallbackHandler(BaseCallbackHandler):
         outputs = None
 
         if event_type == CBEventType.NODE_PARSING:
-            # parse input payload
-            input_payload = event_pair[0].payload
-            if input_payload:
+            if input_payload := event_pair[0].payload:
                 inputs = self._handle_node_parsing_payload(input_payload)
-            # parse output payload
-            output_payload = event_pair[-1].payload
-            if output_payload:
+            if output_payload := event_pair[-1].payload:
                 outputs = self._handle_node_parsing_payload(output_payload)
         elif event_type == CBEventType.LLM:
             inputs, outputs, span = self._handle_llm_payload(event_pair, span)
@@ -432,7 +427,7 @@ class WandbCallbackHandler(BaseCallbackHandler):
         if stuffs:
             tmp_str = ""
             for idx, stuff in enumerate(stuffs):
-                tmp_str += f"**{stuff_name}**: {idx}\n" + stuff.text
+                tmp_str += f"**{stuff_name}**: {idx}\n{stuff.text}"
                 tmp_str += "\n*************** \n"
             return {"documents": tmp_str, "len_documents": len(stuffs)}
         else:

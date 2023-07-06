@@ -26,7 +26,7 @@ try:
     conn__.close()
 
     postgres_not_available = False
-except (ImportError, Exception):
+except Exception:
     postgres_not_available = True
 
 
@@ -34,8 +34,7 @@ except (ImportError, Exception):
 def conn() -> Any:
     import psycopg2
 
-    conn_ = psycopg2.connect(**PARAMS)  # type: ignore
-    return conn_
+    return psycopg2.connect(**PARAMS)
 
 
 @pytest.fixture(scope="session")

@@ -68,9 +68,7 @@ def generate_sparse_vectors(
     """
     # create batch of input_ids
     inputs = tokenizer(context_batch)["input_ids"]
-    # create sparse dictionaries
-    sparse_embeds = build_dict(inputs)
-    return sparse_embeds
+    return build_dict(inputs)
 
 
 def get_default_tokenizer() -> Callable:
@@ -82,22 +80,17 @@ def get_default_tokenizer() -> Callable:
     from transformers import BertTokenizerFast
 
     orig_tokenizer = BertTokenizerFast.from_pretrained("bert-base-uncased")
-    # set some default arguments, so input is just a list of strings
-    tokenizer = partial(
+    return partial(
         orig_tokenizer,
         padding=True,
         truncation=True,
         max_length=512,
     )
-    return tokenizer
 
 
 def _to_pinecone_filter(standard_filters: MetadataFilters) -> dict:
     """Convert from standard dataclass to pinecone filter dict."""
-    filters = {}
-    for filter in standard_filters.filters:
-        filters[filter.key] = filter.value
-    return filters
+    return {filter.key: filter.value for filter in standard_filters.filters}
 
 
 class PineconeVectorStore(VectorStore):
@@ -262,17 +255,17 @@ class PineconeVectorStore(VectorStore):
             if query.alpha is not None:
                 query_embedding = [v * query.alpha for v in query_embedding]
 
-        if query.filters is not None:
-            if "filter" in kwargs:
-                raise ValueError(
-                    "Cannot specify filter via both query and kwargs. "
-                    "Use kwargs only for pinecone specific items that are "
-                    "not supported via the generic query interface."
-                )
-            filter = _to_pinecone_filter(query.filters)
-        else:
+        if query.filters is None:
             filter = kwargs.pop("filter", {})
 
+        elif "filter" in kwargs:
+            raise ValueError(
+                "Cannot specify filter via both query and kwargs. "
+                "Use kwargs only for pinecone specific items that are "
+                "not supported via the generic query interface."
+            )
+        else:
+            filter = _to_pinecone_filter(query.filters)
         response = self._pinecone_index.query(
             vector=query_embedding,
             sparse_vector=sparse_vector,

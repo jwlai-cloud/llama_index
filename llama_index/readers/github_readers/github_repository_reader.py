@@ -84,12 +84,12 @@ class GithubRepositoryReader(BaseReader):
         super().__init__()
         if github_token is None:
             github_token = os.getenv("GITHUB_TOKEN")
-            if github_token is None:
-                raise ValueError(
-                    "Please provide a Github token. "
-                    "You can do so by passing it as an argument or "
-                    + "by setting the GITHUB_TOKEN environment variable."
-                )
+        if github_token is None:
+            raise ValueError(
+                "Please provide a Github token. "
+                "You can do so by passing it as an argument or "
+                + "by setting the GITHUB_TOKEN environment variable."
+            )
 
         self._owner = owner
         self._repo = repo

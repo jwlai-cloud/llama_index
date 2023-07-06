@@ -64,7 +64,6 @@ class CondenseQuestionChatEngine(BaseChatEngine):
     ) -> "CondenseQuestionChatEngine":
         """Initialize a CondenseQuestionChatEngine from default parameters."""
         condense_question_prompt = condense_question_prompt or DEFAULT_PROMPT
-        chat_history = chat_history or []
         service_context = service_context or ServiceContext.from_defaults()
 
         if system_prompt is not None:
@@ -76,6 +75,7 @@ class CondenseQuestionChatEngine(BaseChatEngine):
                 "prefix_messages is not supported for CondenseQuestionChatEngine."
             )
 
+        chat_history = chat_history or []
         return cls(
             query_engine,
             condense_question_prompt,
@@ -94,12 +94,11 @@ class CondenseQuestionChatEngine(BaseChatEngine):
         chat_history_str = messages_to_history_str(chat_history)
         logger.debug(chat_history_str)
 
-        response = self._service_context.llm_predictor.predict(
+        return self._service_context.llm_predictor.predict(
             self._condense_question_prompt,
             question=last_message,
             chat_history=chat_history_str,
         )
-        return response
 
     async def _acondense_question(
         self, chat_history: List[ChatMessage], last_message: str
@@ -111,12 +110,11 @@ class CondenseQuestionChatEngine(BaseChatEngine):
         chat_history_str = messages_to_history_str(chat_history)
         logger.debug(chat_history_str)
 
-        response = await self._service_context.llm_predictor.apredict(
+        return await self._service_context.llm_predictor.apredict(
             self._condense_question_prompt,
             question=last_message,
             chat_history=chat_history_str,
         )
-        return response
 
     def chat(
         self, message: str, chat_history: Optional[List[ChatMessage]] = None

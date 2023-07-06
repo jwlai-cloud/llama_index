@@ -26,10 +26,9 @@ def get_data_model(base: Type, index_name: str) -> Any:
         node_id = Column(VARCHAR)
         embedding = Column(Vector(1536))  # type: ignore
 
-    tablename = "data_%s" % index_name  # dynamic table name
-    class_name = "Data%s" % index_name  # dynamic class name
-    model = type(class_name, (AbstractData,), {"__tablename__": tablename})
-    return model
+    tablename = f"data_{index_name}"
+    class_name = f"Data{index_name}"
+    return type(class_name, (AbstractData,), {"__tablename__": tablename})
 
 
 class PGVectorStore(VectorStore):

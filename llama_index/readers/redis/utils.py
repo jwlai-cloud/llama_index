@@ -28,7 +28,7 @@ class TokenEscaper:
 
     def escape(self, value: str) -> str:
         def escape_symbol(match: re.Match) -> str:
-            value = match.group(0)
+            value = match[0]
             return f"\\{value}"
 
         return self.escaped_chars_re.sub(escape_symbol, value)
@@ -97,9 +97,7 @@ def convert_bytes(data: Any) -> Any:
         return dict(map(convert_bytes, data.items()))
     if isinstance(data, list):
         return list(map(convert_bytes, data))
-    if isinstance(data, tuple):
-        return map(convert_bytes, data)
-    return data
+    return map(convert_bytes, data) if isinstance(data, tuple) else data
 
 
 def array_to_buffer(array: List[float], dtype: Any = np.float32) -> bytes:

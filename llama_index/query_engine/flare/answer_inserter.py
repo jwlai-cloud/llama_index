@@ -152,17 +152,16 @@ class LLMLookaheadAnswerInserter(BaseLookaheadAnswerInserter):
         """Insert answers into response."""
         prev_response = prev_response or ""
 
-        query_answer_pairs = ""
-        for query_task, answer in zip(query_tasks, answers):
-            query_answer_pairs += f"Query: {query_task.query_str}\nAnswer: {answer}\n"
-
-        response = self._service_context.llm_predictor.predict(
+        query_answer_pairs = "".join(
+            f"Query: {query_task.query_str}\nAnswer: {answer}\n"
+            for query_task, answer in zip(query_tasks, answers)
+        )
+        return self._service_context.llm_predictor.predict(
             self._answer_insert_prompt,
             lookahead_response=response,
             query_answer_pairs=query_answer_pairs,
             prev_response=prev_response,
         )
-        return response
 
 
 class DirectLookaheadAnswerInserter(BaseLookaheadAnswerInserter):

@@ -15,10 +15,7 @@ def default_stop_fn(stop_dict: Dict) -> bool:
     if query_bundle is None:
         raise ValueError("Response must be provided to stop function.")
 
-    if "none" in query_bundle.query_str.lower():
-        return True
-    else:
-        return False
+    return "none" in query_bundle.query_str.lower()
 
 
 class MultiStepQueryEngine(BaseQueryEngine):
@@ -138,9 +135,6 @@ class MultiStepQueryEngine(BaseQueryEngine):
             if self._num_steps is not None and cur_steps >= self._num_steps:
                 should_stop = True
                 break
-            elif should_stop:
-                break
-
             updated_query_bundle = self._combine_queries(query_bundle, prev_reasoning)
 
             # TODO: make stop logic better
@@ -157,8 +151,7 @@ class MultiStepQueryEngine(BaseQueryEngine):
                 f"Answer: {str(cur_response)}"
             )
             text_chunks.append(cur_qa_text)
-            for source_node in cur_response.source_nodes:
-                source_nodes.append(source_node)
+            source_nodes.extend(iter(cur_response.source_nodes))
             # update metadata
             final_response_metadata["sub_qa"].append(
                 (updated_query_bundle.query_str, cur_response)

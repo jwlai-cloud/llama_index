@@ -19,13 +19,7 @@ def hash_string_to_rank(string: str) -> int:
     mask = (1 << 64) - 1
     signed_hash &= mask
 
-    # convert the signed hash value to an unsigned 64-bit integer
-    if signed_hash & (1 << 63):
-        unsigned_hash = -((signed_hash ^ mask) + 1)
-    else:
-        unsigned_hash = signed_hash
-
-    return unsigned_hash
+    return -((signed_hash ^ mask) + 1) if signed_hash & (1 << 63) else signed_hash
 
 
 def prepare_subjs_param(subjs: Optional[List[str]]) -> dict:
@@ -127,8 +121,8 @@ class NebulaGraphStore(GraphStore):
 
         # ensure "NEBULA_USER", "NEBULA_PASSWORD", "NEBULA_ADDRESS" are set
         # in environment variables
-        if not all(
-            key in os.environ
+        if any(
+            key not in os.environ
             for key in ["NEBULA_USER", "NEBULA_PASSWORD", "NEBULA_ADDRESS"]
         ):
             raise ValueError(
@@ -174,20 +168,16 @@ class NebulaGraphStore(GraphStore):
                     raise ValueError(result.error_msg())
                 return result
             except (TTransportException, IOErrorException) as e:
-                # connection issue, try to recreate session pool
-                if retry > 0:
-                    retry -= 2
-                    # try to recreate session pool
-                    self.init_session_pool()
-                else:
+                if retry <= 0:
                     raise e
+                retry -= 2
+                # try to recreate session pool
+                self.init_session_pool()
             except ValueError as e:
-                # query failed on db side
-                if retry > 0:
-                    retry -= 1
-                    continue
-                else:
+                if retry <= 0:
                     raise e
+                retry -= 1
+                continue
             except Exception as e:
                 raise e
 
@@ -365,7 +355,7 @@ class NebulaGraphStore(GraphStore):
         # lower case subjs
         if subjs is not None:
             subjs = [escape_str(subj.lower()) for subj in subjs]
-            if len(subjs) == 0:
+            if not subjs:
                 return {}
 
         return self.get_flat_rel_map(subjs, depth)

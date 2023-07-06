@@ -18,7 +18,7 @@ def get_top_k_embeddings(
 ) -> Tuple[List[float], List]:
     """Get top nodes by similarity to the query."""
     if embedding_ids is None:
-        embedding_ids = [i for i in range(len(embeddings))]
+        embedding_ids = list(range(len(embeddings)))
 
     similarity_fn = similarity_fn or default_similarity_fn
 
@@ -29,9 +29,7 @@ def get_top_k_embeddings(
             heapq.heappush(similarity_heap, (similarity, embedding_ids[i]))
             if similarity_top_k and len(similarity_heap) > similarity_top_k:
                 heapq.heappop(similarity_heap)
-    result_tups = [
-        (s, id) for s, id in sorted(similarity_heap, key=lambda x: x[0], reverse=True)
-    ]
+    result_tups = list(sorted(similarity_heap, key=lambda x: x[0], reverse=True))
 
     result_similarities = [s for s, _ in result_tups]
     result_ids = [n for _, n in result_tups]
@@ -60,7 +58,7 @@ def get_top_k_embeddings_learner(
         raise ImportError("Please install scikit-learn to use this feature.")
 
     if embedding_ids is None:
-        embedding_ids = [i for i in range(len(embeddings))]
+        embedding_ids = list(range(len(embeddings)))
     query_embedding_np = np.array(query_embedding)
     embeddings_np = np.array(embeddings)
     # create dataset
@@ -115,7 +113,7 @@ def get_top_k_mmr_embeddings(
     similarity_fn = similarity_fn or default_similarity_fn
 
     if embedding_ids is None or embedding_ids == []:
-        embedding_ids = [i for i in range(len(embeddings))]
+        embedding_ids = list(range(len(embeddings)))
     full_embed_map = dict(zip(embedding_ids, range(len(embedding_ids))))
     embed_map = full_embed_map.copy()
     embed_similarity = {}
@@ -143,7 +141,7 @@ def get_top_k_mmr_embeddings(
         score = -math.inf
 
         # Iterate through results to find high score
-        for embed_id in embed_map.keys():
+        for embed_id in embed_map:
             overlap_with_recent = similarity_fn(
                 embeddings[embed_map[embed_id]],
                 embeddings[full_embed_map[recent_embedding_id]],
