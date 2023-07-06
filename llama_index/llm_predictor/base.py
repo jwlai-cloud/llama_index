@@ -84,12 +84,10 @@ class LLMPredictor(BaseLLMPredictor):
         """Log start of an LLM event."""
         llm_payload = prompt_args.copy()
         llm_payload[EventPayload.TEMPLATE] = prompt
-        event_id = self.callback_manager.on_event_start(
+        return self.callback_manager.on_event_start(
             CBEventType.LLM,
             payload=llm_payload,
         )
-
-        return event_id
 
     def _log_end(self, event_id: str, output: str, formatted_prompt: str) -> None:
         """Log end of an LLM event."""
@@ -133,12 +131,11 @@ class LLMPredictor(BaseLLMPredictor):
         if self._llm.metadata.is_chat_model:
             messages = prompt.format_messages(llm=self._llm, **prompt_args)
             chat_response = self._llm.stream_chat(messages=messages)
-            stream_tokens = stream_chat_response_to_tokens(chat_response)
+            return stream_chat_response_to_tokens(chat_response)
         else:
             formatted_prompt = prompt.format(llm=self._llm, **prompt_args)
             stream_response = self._llm.stream_complete(formatted_prompt)
-            stream_tokens = stream_completion_response_to_tokens(stream_response)
-        return stream_tokens
+            return stream_completion_response_to_tokens(stream_response)
 
     async def apredict(self, prompt: Prompt, **prompt_args: Any) -> str:
         """Async predict."""
@@ -165,9 +162,8 @@ class LLMPredictor(BaseLLMPredictor):
         if self._llm.metadata.is_chat_model:
             messages = prompt.format_messages(llm=self._llm, **prompt_args)
             chat_response = await self._llm.astream_chat(messages=messages)
-            stream_tokens = await astream_chat_response_to_tokens(chat_response)
+            return await astream_chat_response_to_tokens(chat_response)
         else:
             formatted_prompt = prompt.format(llm=self._llm, **prompt_args)
             stream_response = await self._llm.astream_complete(formatted_prompt)
-            stream_tokens = await astream_completion_response_to_tokens(stream_response)
-        return stream_tokens
+            return await astream_completion_response_to_tokens(stream_response)

@@ -102,9 +102,9 @@ class TokenTextSplitter(TextSplitter):
                         # split cur_split according to chunk size of the token numbers
                         cur_split_chunks = []
                         end_idx = len(cur_split)
-                        while len(self.tokenizer(cur_split[0:end_idx])) > chunk_size:
+                        while len(self.tokenizer(cur_split[:end_idx])) > chunk_size:
                             for i in range(1, end_idx):
-                                tmp_split = cur_split[0 : end_idx - i]
+                                tmp_split = cur_split[:end_idx - i]
                                 if len(self.tokenizer(tmp_split)) <= chunk_size:
                                     cur_split_chunks.append(tmp_split)
                                     cur_split = cur_split[end_idx - i : end_idx]
@@ -118,13 +118,7 @@ class TokenTextSplitter(TextSplitter):
 
     def _postprocess_splits(self, docs: List[TextSplit]) -> List[TextSplit]:
         """Post-process splits."""
-        # TODO: prune text splits, remove empty spaces
-        new_docs = []
-        for doc in docs:
-            if doc.text_chunk.replace(" ", "") == "":
-                continue
-            new_docs.append(doc)
-        return new_docs
+        return [doc for doc in docs if doc.text_chunk.replace(" ", "") != ""]
 
     def split_text(self, text: str, metadata_str: Optional[str] = None) -> List[str]:
         """Split incoming text and return chunks."""
@@ -144,7 +138,7 @@ class TokenTextSplitter(TextSplitter):
         self, text: str, metadata_str: Optional[str] = None
     ) -> List[TextSplit]:
         """Split incoming text and return chunks with overlap size."""
-        if text == "":
+        if not text:
             return []
         event_id = self.callback_manager.on_event_start(
             CBEventType.CHUNKING, payload={EventPayload.CHUNKS: text}
@@ -196,7 +190,7 @@ class TokenTextSplitter(TextSplitter):
                 overlap = 0
                 # after first round, check if last chunk ended after this chunk begins
                 if prev_idx > 0 and prev_idx > start_idx:
-                    overlap = sum([len(splits[i]) for i in range(start_idx, prev_idx)])
+                    overlap = sum(len(splits[i]) for i in range(start_idx, prev_idx))
 
                 docs.append(
                     TextSplit(self._separator.join(splits[start_idx:cur_idx]), overlap)
@@ -230,9 +224,9 @@ class TokenTextSplitter(TextSplitter):
         overlap = 0
         # after first round, check if last chunk ended after this chunk begins
         if prev_idx > start_idx:
-            overlap = sum([len(splits[i]) for i in range(start_idx, prev_idx)]) + len(
-                range(start_idx, prev_idx)
-            )
+            overlap = sum(
+                len(splits[i]) for i in range(start_idx, prev_idx)
+            ) + len(range(start_idx, prev_idx))
         docs.append(TextSplit(self._separator.join(splits[start_idx:cur_idx]), overlap))
 
         # run postprocessing to remove blank spaces
@@ -246,7 +240,7 @@ class TokenTextSplitter(TextSplitter):
 
     def truncate_text(self, text: str) -> str:
         """Truncate text in order to fit the underlying chunk size."""
-        if text == "":
+        if not text:
             return ""
         # First we naively split the large input into a bunch of smaller ones.
         splits = text.split(self._separator)
@@ -329,13 +323,7 @@ class SentenceSplitter(TextSplitter):
 
     def _postprocess_splits(self, docs: List[TextSplit]) -> List[TextSplit]:
         """Post-process splits."""
-        # TODO: prune text splits, remove empty spaces
-        new_docs = []
-        for doc in docs:
-            if doc.text_chunk.replace(" ", "") == "":
-                continue
-            new_docs.append(doc)
-        return new_docs
+        return [doc for doc in docs if doc.text_chunk.replace(" ", "") != ""]
 
     def split_text_with_overlaps(
         self, text: str, metadata_str: Optional[str] = None
@@ -345,7 +333,7 @@ class SentenceSplitter(TextSplitter):
 
         Has a preference for complete sentences, phrases, and minimal overlap.
         """
-        if text == "":
+        if not text:
             return []
         event_id = self.callback_manager.on_event_start(
             CBEventType.CHUNKING, payload={EventPayload.CHUNKS: text}
@@ -383,9 +371,6 @@ class SentenceSplitter(TextSplitter):
         chunked_splits = [self.chunking_tokenizer_fn(text) for text in splits]
         splits = [chunk for split in chunked_splits for chunk in split]
 
-        # Check if any sentences exceed the chunk size. If they do, split again
-        # using the second chunk separator. If it any still exceed,
-        # use the default separator (" ").
         @dataclass
         class Split:
             text: str  # the split text
@@ -416,7 +401,7 @@ class SentenceSplitter(TextSplitter):
         docs: List[TextSplit] = []
         cur_doc_list: List[str] = []
         cur_tokens = 0
-        while len(new_splits) > 0:
+        while new_splits:
             cur_token = new_splits[0]
             cur_len = len(self.tokenizer(cur_token.text))
             if cur_len > effective_chunk_size:
@@ -425,18 +410,17 @@ class SentenceSplitter(TextSplitter):
                 docs.append(TextSplit("".join(cur_doc_list).strip()))
                 cur_doc_list = []
                 cur_tokens = 0
-            else:
-                if (
+            elif (
                     cur_token.is_sentence
                     or cur_tokens + cur_len < effective_chunk_size - self._chunk_overlap
                 ):
-                    cur_tokens += cur_len
-                    cur_doc_list.append(cur_token.text)
-                    new_splits.pop(0)
-                else:
-                    docs.append(TextSplit("".join(cur_doc_list).strip()))
-                    cur_doc_list = []
-                    cur_tokens = 0
+                cur_tokens += cur_len
+                cur_doc_list.append(cur_token.text)
+                new_splits.pop(0)
+            else:
+                docs.append(TextSplit("".join(cur_doc_list).strip()))
+                cur_doc_list = []
+                cur_tokens = 0
 
         docs.append(TextSplit("".join(cur_doc_list).strip()))
 

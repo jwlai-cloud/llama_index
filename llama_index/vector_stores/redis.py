@@ -136,7 +136,7 @@ class RedisVectorStore(VectorStore):
             ValueError: If the index already exists and overwrite is False.
         """
         # check to see if empty document list was passed
-        if len(embedding_results) == 0:
+        if not embedding_results:
             return []
 
         # set vector dim for creation if index doesn't exist
@@ -162,7 +162,7 @@ class RedisVectorStore(VectorStore):
             additional_metadata = node_to_metadata_dict(
                 result.node, remove_text=True, flat_metadata=self.flat_metadata
             )
-            mapping.update(additional_metadata)
+            mapping |= additional_metadata
 
             ids.append(result.id)
             key = "_".join([self._prefix, str(result.id)])

@@ -186,9 +186,7 @@ class BaseNode(BaseModel):
     def ref_doc_id(self) -> Optional[str]:
         """Deprecated: Get ref doc id."""
         source_node = self.source_node
-        if source_node is None:
-            return None
-        return source_node.node_id
+        return None if source_node is None else source_node.node_id
 
     @property
     def extra_info(self) -> Dict[str, Any]:

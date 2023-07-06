@@ -131,8 +131,7 @@ class TreeIndex(BaseIndex[IndexGraph]):
             show_progress=self._show_progress,
             docstore=self._docstore,
         )
-        index_graph = index_builder.build_from_nodes(nodes, build_tree=self.build_tree)
-        return index_graph
+        return index_builder.build_from_nodes(nodes, build_tree=self.build_tree)
 
     def _insert(self, nodes: Sequence[BaseNode], **insert_kwargs: Any) -> None:
         """Insert a document."""
@@ -163,11 +162,8 @@ class TreeIndex(BaseIndex[IndexGraph]):
             if not ref_node:
                 continue
 
-            ref_doc_info = self.docstore.get_ref_doc_info(ref_node.node_id)
-            if not ref_doc_info:
-                continue
-
-            all_ref_doc_info[ref_node.node_id] = ref_doc_info
+            if ref_doc_info := self.docstore.get_ref_doc_info(ref_node.node_id):
+                all_ref_doc_info[ref_node.node_id] = ref_doc_info
         return all_ref_doc_info
 
 

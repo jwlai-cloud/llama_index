@@ -65,8 +65,7 @@ class SQLStructStoreQueryEngine(BaseQueryEngine):
         # NOTE: since the query_str is a SQL query, it doesn't make sense
         # to use ResponseBuilder anywhere.
         response_str, metadata = self._sql_database.run_sql(query_bundle.query_str)
-        response = Response(response=response_str, metadata=metadata)
-        return response
+        return Response(response=response_str, metadata=metadata)
 
     async def _aquery(self, query_bundle: QueryBundle) -> Response:
         return self._query(query_bundle)
@@ -127,8 +126,7 @@ class NLStructStoreQueryEngine(BaseQueryEngine):
 
     def _parse_response_to_sql(self, response: str) -> str:
         """Parse response to SQL."""
-        result_response = response.strip()
-        return result_response
+        return response.strip()
 
     def _get_table_context(self, query_bundle: QueryBundle) -> str:
         """Get table context.
@@ -138,20 +136,15 @@ class NLStructStoreQueryEngine(BaseQueryEngine):
 
         """
         if self._sql_context_container.context_str is not None:
-            tables_desc_str = self._sql_context_container.context_str
-        else:
-            table_desc_list = []
-            context_dict = self._sql_context_container.context_dict
-            if context_dict is None:
-                raise ValueError(
-                    "context_dict must be provided. There is currently no "
-                    "table context."
-                )
-            for table_desc in context_dict.values():
-                table_desc_list.append(table_desc)
-            tables_desc_str = "\n\n".join(table_desc_list)
-
-        return tables_desc_str
+            return self._sql_context_container.context_str
+        context_dict = self._sql_context_container.context_dict
+        if context_dict is None:
+            raise ValueError(
+                "context_dict must be provided. There is currently no "
+                "table context."
+            )
+        table_desc_list = list(context_dict.values())
+        return "\n\n".join(table_desc_list)
 
     def _query(self, query_bundle: QueryBundle) -> Response:
         """Answer a query."""
@@ -182,8 +175,7 @@ class NLStructStoreQueryEngine(BaseQueryEngine):
         else:
             response_str = raw_response_str
 
-        response = Response(response=response_str, metadata=metadata)
-        return response
+        return Response(response=response_str, metadata=metadata)
 
     async def _aquery(self, query_bundle: QueryBundle) -> Response:
         """Answer a query."""
@@ -203,8 +195,7 @@ class NLStructStoreQueryEngine(BaseQueryEngine):
 
         response_str, metadata = self._sql_database.run_sql(sql_query_str)
         metadata["sql_query"] = sql_query_str
-        response = Response(response=response_str, metadata=metadata)
-        return response
+        return Response(response=response_str, metadata=metadata)
 
 
 class BaseSQLTableQueryEngine(BaseQueryEngine):
@@ -237,8 +228,7 @@ class BaseSQLTableQueryEngine(BaseQueryEngine):
 
     def _parse_response_to_sql(self, response: str) -> str:
         """Parse response to SQL."""
-        result_response = response.strip()
-        return result_response
+        return response.strip()
 
     @abstractmethod
     def _get_table_context(self, query_bundle: QueryBundle) -> str:
@@ -277,8 +267,7 @@ class BaseSQLTableQueryEngine(BaseQueryEngine):
         else:
             response_str = raw_response_str
 
-        response = Response(response=response_str, metadata=metadata)
-        return response
+        return Response(response=response_str, metadata=metadata)
 
     async def _aquery(self, query_bundle: QueryBundle) -> Response:
         """Answer a query."""
@@ -298,8 +287,7 @@ class BaseSQLTableQueryEngine(BaseQueryEngine):
 
         response_str, metadata = self._sql_database.run_sql(sql_query_str)
         metadata["sql_query"] = sql_query_str
-        response = Response(response=response_str, metadata=metadata)
-        return response
+        return Response(response=response_str, metadata=metadata)
 
 
 class NLSQLTableQueryEngine(BaseSQLTableQueryEngine):
@@ -353,8 +341,7 @@ class NLSQLTableQueryEngine(BaseSQLTableQueryEngine):
                 table_info = self._sql_database.get_single_table_info(table_name)
                 context_strs.append(table_info)
 
-        tables_desc_str = "\n\n".join(context_strs)
-        return tables_desc_str
+        return "\n\n".join(context_strs)
 
 
 class SQLTableRetrieverQueryEngine(BaseSQLTableQueryEngine):
@@ -403,8 +390,7 @@ class SQLTableRetrieverQueryEngine(BaseSQLTableQueryEngine):
             )
             context_strs.append(table_info)
 
-        tables_desc_str = "\n\n".join(context_strs)
-        return tables_desc_str
+        return "\n\n".join(context_strs)
 
 
 # legacy

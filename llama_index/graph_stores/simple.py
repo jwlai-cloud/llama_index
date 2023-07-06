@@ -34,10 +34,7 @@ class SimpleGraphStoreData(DataClassJsonMixin):
         """Get subjects' rel map in max depth."""
         if subjs is None:
             subjs = list(self.graph_dict.keys())
-        rel_map = {}
-        for subj in subjs:
-            rel_map[subj] = self._get_rel_map(subj, depth=depth)
-        return rel_map
+        return {subj: self._get_rel_map(subj, depth=depth) for subj in subjs}
 
     def _get_rel_map(self, subj: str, depth: int = 2) -> List[List[str]]:
         """Get one subect's rel map in max depth."""

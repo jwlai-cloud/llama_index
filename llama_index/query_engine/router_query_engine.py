@@ -102,7 +102,7 @@ class RouterQueryEngine(BaseQueryEngine):
     ) -> "RouterQueryEngine":
         if selector is None and select_multi:
             selector = LLMMultiSelector.from_defaults(service_context=service_context)
-        elif selector is None and not select_multi:
+        elif selector is None:
             selector = LLMSingleSelector.from_defaults(service_context=service_context)
 
         assert selector is not None

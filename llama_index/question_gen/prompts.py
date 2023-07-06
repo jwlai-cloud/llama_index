@@ -10,11 +10,8 @@ SubQuestionPrompt = Prompt
 
 
 def build_tools_text(tools: Sequence[ToolMetadata]) -> str:
-    tools_dict = {}
-    for tool in tools:
-        tools_dict[tool.name] = tool.description
-    tools_str = json.dumps(tools_dict, indent=4)
-    return tools_str
+    tools_dict = {tool.name: tool.description for tool in tools}
+    return json.dumps(tools_dict, indent=4)
 
 
 PREFIX = """\

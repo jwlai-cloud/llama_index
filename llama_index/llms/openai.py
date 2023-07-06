@@ -89,11 +89,10 @@ class OpenAI(LLM, BaseModel):
             "temperature": self.temperature,
             "max_tokens": self.max_tokens,
         }
-        model_kwargs = {
+        return {
             **base_kwargs,
             **self.additional_kwargs,
         }
-        return model_kwargs
 
     def _get_all_kwargs(self, **kwargs: Any) -> Dict[str, Any]:
         return {

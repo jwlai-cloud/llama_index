@@ -99,12 +99,10 @@ class MockLLMPredictor(BaseLLMPredictor):
         """Log start of an LLM event."""
         llm_payload = prompt_args.copy()
         llm_payload[EventPayload.TEMPLATE] = prompt
-        event_id = self.callback_manager.on_event_start(
+        return self.callback_manager.on_event_start(
             CBEventType.LLM,
             payload=llm_payload,
         )
-
-        return event_id
 
     def _log_end(self, event_id: str, output: str, formatted_prompt: str) -> None:
         """Log end of an LLM event."""

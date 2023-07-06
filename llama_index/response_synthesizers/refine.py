@@ -81,7 +81,7 @@ class Refine(BaseSynthesizer):
                     text_qa_template,
                     context_str=cur_text_chunk,
                 )
-            elif response is None and self._streaming:
+            elif response is None:
                 response = self._service_context.llm_predictor.stream(
                     text_qa_template,
                     context_str=cur_text_chunk,
@@ -225,7 +225,7 @@ class Refine(BaseSynthesizer):
                     text_qa_template,
                     context_str=cur_text_chunk,
                 )
-            elif response is None and self._streaming:
+            elif response is None:
                 raise ValueError("Streaming not supported for async")
             else:
                 response = await self._arefine_response_single(

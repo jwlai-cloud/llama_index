@@ -99,7 +99,7 @@ class OpensearchVectorClient:
         }
         res = self._client.put(f"/{self._index}", json=idx_conf)
         # will 400 if the index already existed, so allow 400 errors right here
-        assert res.status_code == 200 or res.status_code == 400
+        assert res.status_code in [200, 400]
 
     def index_results(self, results: List[NodeWithEmbedding]) -> List[str]:
         """Store results in the index."""

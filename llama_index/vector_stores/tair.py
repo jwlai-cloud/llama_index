@@ -27,8 +27,8 @@ def _to_filter_expr(filters: MetadataFilters) -> str:
     for f in filters.filters:
         value = str(f.value)
         if type(f.value) == str:
-            value = '"' + value + '"'
-        conditions.append("%s==%s" % (f.key, value))
+            value = f'"{value}"'
+        conditions.append(f"{f.key}=={value}")
     return "&&".join(conditions)
 
 
@@ -131,7 +131,7 @@ class TairVectorStore(VectorStore):
             List[str]: List of ids of the documents added to the index.
         """
         # check to see if empty document list was passed
-        if len(embedding_results) == 0:
+        if not embedding_results:
             return []
 
         # set vector dim for creation if index doesn't exist
@@ -156,12 +156,12 @@ class TairVectorStore(VectorStore):
             metadata_dict = node_to_metadata_dict(
                 result.node, remove_text=True, flat_metadata=self.flat_metadata
             )
-            attributes.update(metadata_dict)
+            attributes |= metadata_dict
 
             ids.append(result.id)
             self._tair_client.tvs_hset(
                 self._index_name,
-                "%s#%s" % (result.ref_doc_id, result.id),
+                f"{result.ref_doc_id}#{result.id}",
                 vector=result.embedding,
                 is_binary=False,
                 **attributes,
@@ -177,7 +177,7 @@ class TairVectorStore(VectorStore):
             doc_id (str): document id
 
         """
-        iter = self._tair_client.tvs_scan(self._index_name, "%s#*" % ref_doc_id)
+        iter = self._tair_client.tvs_scan(self._index_name, f"{ref_doc_id}#*")
         for k in iter:
             self._tair_client.tvs_del(self._index_name, k)
 
@@ -198,10 +198,7 @@ class TairVectorStore(VectorStore):
         Raises:
             ValueError: If query.query_embedding is None.
         """
-        filter_expr = None
-        if query.filters is not None:
-            filter_expr = _to_filter_expr(query.filters)
-
+        filter_expr = None if query.filters is None else _to_filter_expr(query.filters)
         if not query.query_embedding:
             raise ValueError("Query embedding is required for querying.")
 
@@ -229,7 +226,7 @@ class TairVectorStore(VectorStore):
             scores.append(score)
             pipe.tvs_hmget(self._index_name, key, "id", "doc_id", "text")
         metadatas = pipe.execute()
-        for i, m in enumerate(metadatas):
+        for m in metadatas:
             # TODO: properly get the _node_conent
             doc_id = m[0].decode()
             node = TextNode(

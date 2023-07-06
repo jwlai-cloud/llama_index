@@ -72,5 +72,4 @@ class LLMTextCompletionProgram(BasePydanticProgram[BaseModel]):
 
         response = self._llm.complete(formatted_prompt)
         raw_output = response.text
-        model_output = self._output_parser.parse(raw_output)
-        return model_output
+        return self._output_parser.parse(raw_output)

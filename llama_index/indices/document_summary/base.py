@@ -94,10 +94,10 @@ class DocumentSummaryIndex(BaseIndex[IndexDocumentSummary]):
             DocumentSummaryIndexRetriever,
         )
 
-        DSIR = DocumentSummaryIndexRetriever
         DSIER = DocumentSummaryIndexEmbeddingRetriever
 
         if retriever_mode == DSRM.DEFAULT:
+            DSIR = DocumentSummaryIndexRetriever
             return DSIR(self, **kwargs)
         elif retriever_mode == DSRM.EMBEDDING:
             return DSIER(self, **kwargs)
@@ -194,11 +194,8 @@ class DocumentSummaryIndex(BaseIndex[IndexDocumentSummary]):
 
         all_ref_doc_info = {}
         for ref_doc_id in ref_doc_ids:
-            ref_doc_info = self.docstore.get_ref_doc_info(ref_doc_id)
-            if not ref_doc_info:
-                continue
-
-            all_ref_doc_info[ref_doc_id] = ref_doc_info
+            if ref_doc_info := self.docstore.get_ref_doc_info(ref_doc_id):
+                all_ref_doc_info[ref_doc_id] = ref_doc_info
         return all_ref_doc_info
 
 

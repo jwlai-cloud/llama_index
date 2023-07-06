@@ -36,15 +36,14 @@ class PydanticOutputParser(BaseOutputParser):
 
     def parse(self, text: str) -> Any:
         """Parse, validate, and correct errors programmatically."""
-        # NOTE: this regex parsing is taken from langchain.output_parsers.pydantic
-        match = re.search(
-            r"\{.*\}", text.strip(), re.MULTILINE | re.IGNORECASE | re.DOTALL
-        )
-        if match:
-            json_str = match.group()
-            return self._output_cls.parse_raw(json_str)
-        else:
+        if not (
+            match := re.search(
+                r"\{.*\}", text.strip(), re.MULTILINE | re.IGNORECASE | re.DOTALL
+            )
+        ):
             raise ValueError(f"Could not parse output: {text}")
+        json_str = match.group()
+        return self._output_cls.parse_raw(json_str)
 
     def format(self, query: str) -> str:
         """Format a query with structured output formatting instructions."""

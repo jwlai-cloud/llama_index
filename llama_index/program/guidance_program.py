@@ -64,7 +64,6 @@ class GuidancePydanticProgram(BaseLLMFunctionProgram["GuidanceLLM"]):
     ) -> BaseModel:
         executed_program = self._guidance_program(**kwargs)
 
-        pydantic_obj = parse_pydantic_from_guidance_program(
+        return parse_pydantic_from_guidance_program(
             program=executed_program, cls=self._output_cls
         )
-        return pydantic_obj

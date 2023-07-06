@@ -19,7 +19,7 @@ def _get_response_with_sources(response: RESPONSE_TYPE) -> str:
             start = source_node.node.start_char_idx
             end = source_node.node.end_char_idx
             if start is not None and end is not None:
-                metadata.update({"start_char_idx": start, "end_char_idx": end})
+                metadata |= {"start_char_idx": start, "end_char_idx": end}
 
         source_data.append(metadata)
         source_data[-1]["ref_doc_id"] = source_node.node.ref_doc_id

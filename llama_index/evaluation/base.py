@@ -130,12 +130,10 @@ class ResponseEvaluator:
             List of Documents of source nodes information as context information.
         """
 
-        context = []
-
-        for context_info in response.source_nodes:
-            context.append(Document(text=context_info.node.get_content()))
-
-        return context
+        return [
+            Document(text=context_info.node.get_content())
+            for context_info in response.source_nodes
+        ]
 
     def evaluate(self, response: Response) -> str:
         """Evaluate the response from an index.
@@ -250,12 +248,10 @@ class QueryResponseEvaluator(BaseEvaluator):
             List of Documents of source nodes information as context information.
         """
 
-        context = []
-
-        for context_info in response.source_nodes:
-            context.append(Document(text=context_info.node.get_content()))
-
-        return context
+        return [
+            Document(text=context_info.node.get_content())
+            for context_info in response.source_nodes
+        ]
 
     def evaluate(self, query: str, response: Response) -> str:
         """Evaluate the response from an index.
@@ -302,10 +298,9 @@ class QueryResponseEvaluator(BaseEvaluator):
 
         if "yes" in raw_response_txt.lower():
             return Evaluation(query, response, True, "YES")
-        else:
-            if self.raise_error:
-                raise ValueError("The response is invalid")
-            return Evaluation(query, response, False, "NO")
+        if self.raise_error:
+            raise ValueError("The response is invalid")
+        return Evaluation(query, response, False, "NO")
 
     def evaluate_source_nodes(self, query: str, response: Response) -> List[str]:
         """Function to evaluate if each source node contains the answer \

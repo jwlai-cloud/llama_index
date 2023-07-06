@@ -60,18 +60,17 @@ class TreeSummarize(BaseSynthesizer):
         # give final response if there is only one chunk
         if len(text_chunks) == 1:
             response: RESPONSE_TEXT_TYPE
-            if self._streaming:
-                response = self._service_context.llm_predictor.stream(
+            return (
+                self._service_context.llm_predictor.stream(
                     summary_template,
                     context_str=text_chunks[0],
                 )
-            else:
-                response = await self._service_context.llm_predictor.apredict(
+                if self._streaming
+                else await self._service_context.llm_predictor.apredict(
                     summary_template,
                     context_str=text_chunks[0],
                 )
-            return response
-
+            )
         else:
             # summarize each chunk
             tasks = [
@@ -112,18 +111,17 @@ class TreeSummarize(BaseSynthesizer):
         # give final response if there is only one chunk
         if len(text_chunks) == 1:
             response: RESPONSE_TEXT_TYPE
-            if self._streaming:
-                response = self._service_context.llm_predictor.stream(
+            return (
+                self._service_context.llm_predictor.stream(
                     summary_template,
                     context_str=text_chunks[0],
                 )
-            else:
-                response = self._service_context.llm_predictor.predict(
+                if self._streaming
+                else self._service_context.llm_predictor.predict(
                     summary_template,
                     context_str=text_chunks[0],
                 )
-            return response
-
+            )
         else:
             # summarize each chunk
             if self._use_async:

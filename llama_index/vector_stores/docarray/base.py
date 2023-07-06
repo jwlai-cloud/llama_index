@@ -113,7 +113,7 @@ class DocArrayVectorStore(VectorStore, ABC):
         from docarray import DocList
 
         # check to see if empty document list was passed
-        if len(embedding_results) == 0:
+        if not embedding_results:
             return []
 
         docs = DocList[self._schema](  # type: ignore[name-defined]
@@ -160,7 +160,7 @@ class DocArrayVectorStore(VectorStore, ABC):
         if query.filters:
             # only for ExactMatchFilters
             filter_query = {
-                "metadata__" + filter.key: {"$eq": filter.value}
+                f"metadata__{filter.key}": {"$eq": filter.value}
                 for filter in query.filters.filters
             }
             query = (

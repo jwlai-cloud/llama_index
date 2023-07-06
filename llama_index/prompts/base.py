@@ -134,18 +134,17 @@ class Prompt:
         """
         lc_prompt = prompt.get_langchain_prompt(llm=llm)
         tmpl_vars = lc_prompt.input_variables
-        format_dict = {}
-        for var in tmpl_vars:
-            if var not in prompt.partial_dict:
-                format_dict[var] = f"{{{var}}}"
-
+        format_dict = {
+            var: f"{{{var}}}"
+            for var in tmpl_vars
+            if var not in prompt.partial_dict
+        }
         template_str = prompt.format(llm=llm, **format_dict)
-        cls_obj = cls(
+        return cls(
             template_str,
             prompt_type=prompt_type or PromptType.CUSTOM,
             **prompt.prompt_kwargs,
         )
-        return cls_obj
 
     def get_langchain_prompt(self, llm: Optional[LLM] = None) -> BaseLangchainPrompt:
         """Get langchain prompt."""
@@ -153,7 +152,7 @@ class Prompt:
 
     def format(self, llm: Optional[LLM] = None, **kwargs: Any) -> str:
         """Format the prompt into a string."""
-        kwargs.update(self.partial_dict)
+        kwargs |= self.partial_dict
         lc_prompt = self.get_langchain_prompt(llm=llm)
         return lc_prompt.format(**kwargs)
 
@@ -161,7 +160,7 @@ class Prompt:
         self, llm: Optional[LLM] = None, **kwargs: Any
     ) -> List[ChatMessage]:
         """Format the prompt into a list of chat messages."""
-        kwargs.update(self.partial_dict)
+        kwargs |= self.partial_dict
         lc_template = self.get_langchain_prompt(llm=llm)
         lc_value = lc_template.format_prompt(**kwargs)
         lc_messages = lc_value.to_messages()

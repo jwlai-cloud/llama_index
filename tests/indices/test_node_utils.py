@@ -66,8 +66,6 @@ def test_get_nodes_from_document_with_metadata(
         chunk_size <= text_splitter._chunk_size for chunk_size in actual_chunk_sizes
     )
     assert all(
-        [
-            "test_key: test_val" in n.get_content(metadata_mode=MetadataMode.ALL)
-            for n in nodes
-        ]
+        "test_key: test_val" in n.get_content(metadata_mode=MetadataMode.ALL)
+        for n in nodes
     )

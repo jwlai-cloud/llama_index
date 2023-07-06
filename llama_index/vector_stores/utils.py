@@ -71,11 +71,7 @@ def legacy_metadata_dict_to_node(
 
     # load node_info from json string
     node_info_str = metadata.pop("node_info", "")
-    if node_info_str == "":
-        node_info = {}
-    else:
-        node_info = json.loads(node_info_str)
-
+    node_info = {} if node_info_str == "" else json.loads(node_info_str)
     # load relationships from json string
     relationships_str = metadata.pop("relationships", "")
     relationships: Dict[NodeRelationship, RelatedNodeInfo]

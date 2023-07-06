@@ -202,11 +202,8 @@ class BaseKeywordTableIndex(BaseIndex[KeywordTable]):
             if not ref_node:
                 continue
 
-            ref_doc_info = self.docstore.get_ref_doc_info(ref_node.node_id)
-            if not ref_doc_info:
-                continue
-
-            all_ref_doc_info[ref_node.node_id] = ref_doc_info
+            if ref_doc_info := self.docstore.get_ref_doc_info(ref_node.node_id):
+                all_ref_doc_info[ref_node.node_id] = ref_doc_info
         return all_ref_doc_info
 
 
@@ -223,8 +220,7 @@ class KeywordTableIndex(BaseKeywordTableIndex):
             self.keyword_extract_template,
             text=text,
         )
-        keywords = extract_keywords_given_response(response, start_token="KEYWORDS:")
-        return keywords
+        return extract_keywords_given_response(response, start_token="KEYWORDS:")
 
     async def _async_extract_keywords(self, text: str) -> Set[str]:
         """Extract keywords from text."""
@@ -232,8 +228,7 @@ class KeywordTableIndex(BaseKeywordTableIndex):
             self.keyword_extract_template,
             text=text,
         )
-        keywords = extract_keywords_given_response(response, start_token="KEYWORDS:")
-        return keywords
+        return extract_keywords_given_response(response, start_token="KEYWORDS:")
 
 
 # legacy

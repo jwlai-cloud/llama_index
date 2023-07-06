@@ -37,13 +37,12 @@ def test_function_tool() -> None:
     result = langchain_tool.run("1")
     assert result == "1"
 
-    # test langchain structured tool
     class TestSchema(BaseModel):
         x: int
         y: int
 
     function_tool = FunctionTool.from_defaults(
-        lambda x, y: str(x) + "," + str(y),
+        lambda x, y: f"{x},{y}",
         name="foo",
         description="bar",
         fn_schema=TestSchema,

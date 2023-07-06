@@ -181,7 +181,7 @@ class PrevNextNodePostprocessor(BasePydanticNodePostprocessor):
         for node in nodes:
             all_nodes[node.node.node_id] = node
             if self.mode == "next":
-                all_nodes.update(get_forward_nodes(node, self.num_nodes, self.docstore))
+                all_nodes |= get_forward_nodes(node, self.num_nodes, self.docstore)
             elif self.mode == "previous":
                 all_nodes.update(
                     get_backward_nodes(node, self.num_nodes, self.docstore)
@@ -195,7 +195,7 @@ class PrevNextNodePostprocessor(BasePydanticNodePostprocessor):
                 raise ValueError(f"Invalid mode: {self.mode}")
 
         all_nodes_values: List[NodeWithScore] = list(all_nodes.values())
-        sorted_nodes: List[NodeWithScore] = list()
+        sorted_nodes: List[NodeWithScore] = []
         for node in all_nodes_values:
             # variable to check if cand node is inserted
             node_inserted = False
@@ -338,14 +338,12 @@ class AutoPrevNextNodePostprocessor(BasePydanticNodePostprocessor):
                 print(f"> Postprocessor Predicted mode: {mode}")
 
             if mode == "next":
-                all_nodes.update(get_forward_nodes(node, self.num_nodes, self.docstore))
+                all_nodes |= get_forward_nodes(node, self.num_nodes, self.docstore)
             elif mode == "previous":
                 all_nodes.update(
                     get_backward_nodes(node, self.num_nodes, self.docstore)
                 )
-            elif mode == "none":
-                pass
-            else:
+            elif mode != "none":
                 raise ValueError(f"Invalid mode: {mode}")
 
         sorted_nodes = sorted(all_nodes.values(), key=lambda x: x.node.node_id)
